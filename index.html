@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CUHK ACM</title>
+    <link rel="stylesheet" href="https://cdn.rawgit.com/olton/Metro-UI-CSS/master/build/css/metro.min.css">
+    <link rel="stylesheet" href="https://cdn.rawgit.com/olton/Metro-UI-CSS/master/build/css/metro-responsive.min.css">
+    <link rel="stylesheet" href="https://cdn.rawgit.com/olton/Metro-UI-CSS/master/build/css/metro-colors.min.css">
+    <link rel="stylesheet" href="https://cdn.rawgit.com/olton/Metro-UI-CSS/master/build/css/metro-icons.min.css">
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+    <script src="https://cdn.rawgit.com/olton/Metro-UI-CSS/master/build/js/metro.min.js"></script>
+    <script src="elm.js"></script>
+  </head>
+  <body>
+    <script>
+      var app = Elm.Main.fullscreen();
+      app.ports.fileChange.subscribe(function(event) {
+        var file = event.target.files[0];
+        if (file.size <= 40000) {
+          var reader = new FileReader();
+          reader.onload = function(event) {
+            app.ports.fileRead.send([
+              file.name,
+              file.size,
+              event.target.result
+            ]);
+          };
+          reader.readAsText(file);
+        } else {
+          app.ports.fileRead.send([
+            file.name,
+            file.size,
+            ""
+          ]);
+        }
+      });
+      app.ports.notify.subscribe(function(s) {
+        $.Notify({
+          caption: "Error",
+          content: s,
+          type: "alert"
+        })
+      })
+    </script>
+  </body>
+</html>

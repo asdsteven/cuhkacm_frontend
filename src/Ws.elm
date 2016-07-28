@@ -154,6 +154,8 @@ update msg model =
     case msg of
         HubMsg (Hub.Contest s) ->
             request ("contest " ++ s) model
+        HubMsg (Hub.Login "") ->
+            model ! []
         HubMsg (Hub.Login s) ->
             request ("login " ++ s) model
         HubMsg (Hub.Logout) ->

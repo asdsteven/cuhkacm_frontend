@@ -110,7 +110,7 @@ view model =
             List.map2 problem az (Array.toList model.problems)
         thead =
             header ++ problems
-                |> List.map (\s -> Html.th [] [s])
+                |> List.map (\s -> Html.th [Attr.style [("text-align", "center")]] [s])
                 |> Html.tr []
                 |> (\s -> Html.thead [] [s])
         solved =
@@ -162,7 +162,7 @@ view model =
                 r' :: n :: toString s :: toString t :: l
         tbody =
             List.map2 flatten ranks sorted
-                |> List.map (List.map (\s -> Html.td [Attr.style [("text-align", "center")]] [Html.text s]))
+                |> List.map (List.map (\s -> Html.td [Attr.class "align-center"] [Html.text s]))
                 |> List.map (Html.tr [])
                 |> Html.tbody []
     in
@@ -171,4 +171,8 @@ view model =
                   [ ("width", "100%")
                   , ("overflow", "auto")
                   ]
-            ] [Html.table [Attr.class "table striped border"] [thead, tbody]]
+            ]
+            [ Html.table
+                  [ Attr.class "table striped border" ]
+                  [ thead, tbody ]
+            ]

@@ -6,6 +6,7 @@ import Html.Attributes as Attr
 import Html.Events as Events
 
 import Hub
+import Ports
 
 type alias Model =
     { contests : Array String
@@ -19,7 +20,7 @@ type Msg
 
 subscriptions : Sub Msg
 subscriptions =
-    Sub.none
+    Ports.contest (Hub.Contest >> HubMsg)
 
 
 init : Model
@@ -66,9 +67,9 @@ view model =
             Array.map g model.contests
                 |> Array.toList
     in
-        Html.div [Attr.style [("height", "4em")]]
+        Html.div []
             [ Html.div
-                  [ Attr.class "no-tablet"
+                  [ Attr.class "no-tablet align-center"
                   , Attr.style
                         [ ("overflow-x", "auto")
                         , ("overflow-y", "hidden")
@@ -76,12 +77,16 @@ view model =
                         ]
                   ] buttons
             , Html.div
-                [ Attr.class "no-pc input-control select"
-                , Attr.style [("width", "100%")]
-                ]
-                [ Html.select
-                      [ Events.onInput (HubMsg << Hub.Contest)
-                      , Attr.style [("width", "100%")]
-                      ] options
-                ]
+                  [ Attr.class "no-pc input-control full-size no-margin"
+                  , Attr.attribute "data-role" "select"
+                  , Attr.attribute "data-minimum-results-for-search" "Infinity"
+                  , Attr.attribute "data-template-selection" "contest"
+                  ]
+                  [ Html.select
+                        [ Attr.style
+                              [ ("display", "none")
+                              , ("width", "100%")
+                              ]
+                        ] options
+                  ]
             ]

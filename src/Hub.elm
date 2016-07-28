@@ -21,6 +21,8 @@ type alias Submission =
 
 type Msg
     = Error String
+    | Notify (String, String, String)
+    | Oversize Int
     | Contests (Array String)
     | Server Time
     | Contest String

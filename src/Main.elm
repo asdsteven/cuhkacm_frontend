@@ -67,14 +67,14 @@ init =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
+subscriptions model =
     Sub.batch
         [ Sub.map WsMsg Ws.subscriptions
         , Sub.map ContestsMsg Contests.subscriptions
         , Sub.map GreetingMsg Greeting.subscriptions
         , Sub.map TimePanelMsg TimePanel.subscriptions
         , Sub.map LoginPanelMsg LoginPanel.subscriptions
-        , Sub.map SubmitPanelMsg SubmitPanel.subscriptions
+        , Sub.map SubmitPanelMsg <| SubmitPanel.subscriptions model.submitPanel
         , Sub.map SubmissionsMsg Submissions.subscriptions
         , Sub.map ScoresMsg Scores.subscriptions
         , Sub.map LogMsg Log.subscriptions
@@ -170,40 +170,16 @@ view model =
         log =
             App.map LogMsg (Log.view model.log)
         loading =
-            let
-                spacer =
-                    Html.span
-                        [ Attr.style
-                              [ ("display", "inline-block")
-                              , ("width", "0.4em")
-                              ]
-                        ] []
-                spinner =
-                    Html.span
-                        [ Attr.class "mif-spinner3 mif-ani-spin fg-blue mif-4x"
-                        , Attr.style [("vertical-align", "middle")]
-                        ] []
-            in
-                Html.div
-                    [ Attr.style
-                          [ ("text-align", "center")
-                          ]
-                    ]
-                    [ Html.span
-                          [ Attr.style
-                                [ ("height", "55vh")
-                                , ("display", "inline-block")
-                                , ("vertical-align", "middle")
-                                ]
-                          ] []
-                    , Html.h1
-                          [ Attr.style
-                                [ ("display", "inline-block")
-                                ]
-                          ] [spinner, spacer, Html.text "Loading"]
-                    ]
+            Html.div
+                [ Attr.class "leader align-center"
+                , Attr.style [("line-height", "40vh")]
+                ]
+                [ Html.span [Attr.class "mif-spinner3 mif-ani-spin fg-blue mif-4x v-align-middle"] []
+                , Html.text " Loading"
+                ]
         page =
-            Html.div [Attr.class "container"]
+            Html.div
+                [ Attr.class "container" ]
                 [ contests
                 , greeting
                 , timePanel

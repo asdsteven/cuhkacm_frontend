@@ -3,6 +3,7 @@ module Submissions exposing (..)
 import Array exposing (Array)
 import Html exposing (Html)
 import Html.Attributes as Attr
+import Html.Events as Events
 
 import Hub
 
@@ -10,19 +11,19 @@ type alias Model =
     { team : Maybe String
     , problems : Array String
     , submissions : Array Hub.Submission
-    , show : Bool
-    , onlyMine : Bool
-    , onlyAccepted : Bool
+    , showAcceptedOnly : Bool
+    , showMineOnly : Bool
     }
 
 type Msg
     = HubMsg Hub.Msg
-    | Nop
+    | ShowAcceptedOnly Bool
+    | ShowMineOnly Bool
 
 
 init : Model
 init =
-    Model Nothing Array.empty Array.empty True False False
+    Model Nothing Array.empty Array.empty False False
 
 
 subscriptions : Sub Msg
@@ -54,8 +55,10 @@ update msg model =
                 |> flip (!) []
         HubMsg _ ->
             model ! []
-        Nop ->
-            model ! []
+        ShowAcceptedOnly t ->
+            { model | showAcceptedOnly = t } ! []
+        ShowMineOnly t ->
+            { model | showMineOnly = t } ! []
 
 
 view : Model -> Html Msg
@@ -83,18 +86,11 @@ view model =
                         20 -> True
                         _ -> False
                 s = verdictToString v |> Html.text
-                spacer =
-                    Html.span
-                        [ Attr.style
-                              [ ("display", "inline-block")
-                              , ("width", "0.4em")
-                              ]
-                        ] []
                 spinner =
                     Html.span [Attr.class "mif-spinner3 mif-ani-spin fg-blue"] []
             in
                 if judging
-                then Html.span [] [spinner, spacer, s]
+                then Html.span [] [spinner, Html.text " ", s]
                 else s
         verdictToString v =
             case v of
@@ -119,7 +115,7 @@ view model =
             case r of
                 Just r' -> toString r' ++ " ms"
                 Nothing -> ""
-        row i s =
+        row (i, s) =
             [ Html.a [Attr.href s.url] [toString i |> Html.text]
             , s.team |> Html.text
             , Array.get s.pid model.problems |> Maybe.withDefault "???" |> Html.text
@@ -128,21 +124,53 @@ view model =
             , runtimeToString s.runtime |> Html.text
             , toString s.minutes |> Html.text
             ]
+        filter (_, s) =
+            (not model.showAcceptedOnly || s.verdict == 90) && (not model.showMineOnly || Just s.team == model.team)
         tbody =
             Array.toList model.submissions
-                |> List.indexedMap row
+                |> List.indexedMap (,)
+                |> List.filter filter
+                |> List.map row
                 |> List.reverse
                 |> List.map (List.map (\s -> Html.td [] [s]))
                 |> List.map (Html.tr [])
                 |> Html.tbody []
     in
         Html.div
-            [ Attr.style
-                  [ ("height", "16em")
+            [ Attr.class "padding10 no-padding-top no-padding-bottom margin10 no-margin-left no-margin-right"
+            , Attr.style
+                  [ ("height", "12em")
                   , ("overflow", "auto")
+                  , ("box-shadow", "inset 0px 0px 3px 0px rgba(0, 0, 0, 0.3), inset 0px 4px 5px 0px rgba(0, 0, 0, 0.2)")
                   ]
             ]
-            [ Html.table
-                  [Attr.class "table striped border"]
-                  [thead, tbody]
+            [ Html.div
+                  [ Attr.class "margin10 no-margin-left no-margin-right"]
+                  [ Html.label
+                        [ Attr.class "input-control checkbox small-check margin10 no-margin-top no-margin-bottom no-margin-left" ]
+                        [ Html.input
+                              [ Attr.type' "checkbox"
+                              , Events.onCheck ShowAcceptedOnly
+                              ] []
+                        , Html.span [Attr.class "check"] []
+                        , Html.span
+                              [ Attr.class "caption" ]
+                              [ Html.text "Show Accepted only" ]
+                        ]
+                  , Html.label
+                        [ Attr.class "input-control checkbox small-check no-margin" ]
+                        [ Html.input
+                              [ Attr.type' "checkbox"
+                              , Attr.disabled (model.team == Nothing)
+                              , Events.onCheck ShowMineOnly
+                              ] []
+                        , Html.span [Attr.class "check"] []
+                        , Html.span
+                              [ Attr.class "caption" ]
+                              [ Html.text "Show mine only" ]
+                        ]
+                  ]
+            , Html.table
+                  [ Attr.class "table striped border no-margin-top" ]
+                  [ thead, tbody ]
             ]

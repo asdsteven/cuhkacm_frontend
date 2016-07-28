@@ -1,7 +1,7 @@
 {
     "version": "1.0.0",
     "summary": "cuhkacm scoreboard",
-    "repository": "https://github.com/asdsteven/cuhkacm_frontend",
+    "repository": "https://github.com/asdsteven/cuhkacm.git",
     "license": "BSD3",
     "source-directories": [
         "src"

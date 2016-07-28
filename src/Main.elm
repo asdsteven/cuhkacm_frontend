@@ -174,7 +174,10 @@ view model =
                 [ Attr.class "leader align-center"
                 , Attr.style [("line-height", "40vh")]
                 ]
-                [ Html.span [Attr.class "mif-spinner3 mif-ani-spin fg-blue mif-4x v-align-middle"] []
+                [ Html.span
+                      [ Attr.class "mif-spinner3 mif-ani-spin fg-blue mif-4x"
+                      , Attr.style [("vertical-align", "-25%")]
+                      ] []
                 , Html.text " Loading"
                 ]
         page =

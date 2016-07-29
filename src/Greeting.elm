@@ -48,30 +48,25 @@ view model =
     let
         helloGuest =
             Html.h2
-                [ Attr.class "margin20 no-margin-left"
-                ]
+                [ Attr.class "margin20 no-margin-left" ]
                 [ Html.small [] [Html.text "Hello, "]
                 , Html.text "Guest"
                 ]
         hello team =
             Html.h2
-                [ Attr.class "margin20 no-margin-left"
-                ]
+                [ Attr.class "margin20 no-margin-left" ]
                 [ Html.small [] [Html.text "Hello, "]
                 , Html.text team
                 , Html.button
                       [ Attr.classList
-                            [ ("button", True)
-                            , ("rounded", True)
-                            , ("small-button", True)
-                            , ("fg-darkRed", not model.logouting)
-                            , ("bd-darkRed", not model.logouting)
+                            [ ("button small-button rounded margin10", True)
+                            , ("bd-darkRed fg-darkRed", not model.logouting)
                             , ("loading-cube", model.logouting)
                             ]
-                      , Attr.style [("margin-left", "1em")]
                       , Attr.disabled model.logouting
                       , Events.onClick (HubMsg Hub.Logout)
-                      ] [Html.text "Logout"]
+                      ]
+                      [ Html.text "Logout" ]
                 ]
     in
         case model.team of

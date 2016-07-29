@@ -12,7 +12,7 @@ import LoginPanel
 import SubmitPanel
 import Submissions
 import Scores
-import Log
+import Notify
 
 import Hub
 import Ws
@@ -26,7 +26,6 @@ type alias Model =
     , submitPanel : SubmitPanel.Model
     , submissions : Submissions.Model
     , scores : Scores.Model
-    , log : Log.Model
     }
 
 type Msg
@@ -39,7 +38,6 @@ type Msg
     | SubmitPanelMsg SubmitPanel.Msg
     | SubmissionsMsg Submissions.Msg
     | ScoresMsg Scores.Msg
-    | LogMsg Log.Msg
 
 
 main : Program Never
@@ -62,7 +60,6 @@ init =
     , submitPanel = SubmitPanel.init
     , submissions = Submissions.init
     , scores = Scores.init
-    , log = Log.init
     } ! []
 
 
@@ -77,7 +74,6 @@ subscriptions model =
         , Sub.map SubmitPanelMsg <| SubmitPanel.subscriptions model.submitPanel
         , Sub.map SubmissionsMsg Submissions.subscriptions
         , Sub.map ScoresMsg Scores.subscriptions
-        , Sub.map LogMsg Log.subscriptions
         ]
 
 
@@ -88,7 +84,7 @@ hubUpdate msg model =
             let (model', cmd') = u (f msg) (i model)
             in h model model' ! [cmd,Cmd.map g cmd']
     in
-        model ! []
+        model ! [Notify.update msg]
             |> t Ws.HubMsg WsMsg (\m s -> { m | ws = s }) .ws Ws.update
             |> t Contests.HubMsg ContestsMsg (\m s -> { m | contests = s }) .contests Contests.update
             |> t Greeting.HubMsg GreetingMsg (\m s -> { m | greeting = s }) .greeting Greeting.update
@@ -97,7 +93,6 @@ hubUpdate msg model =
             |> t SubmitPanel.HubMsg SubmitPanelMsg (\m s -> { m | submitPanel = s }) .submitPanel SubmitPanel.update
             |> t Submissions.HubMsg SubmissionsMsg (\m s -> { m | submissions = s }) .submissions Submissions.update
             |> t Scores.HubMsg ScoresMsg (\m s -> { m | scores = s }) .scores Scores.update
-            |> t Log.HubMsg LogMsg (\m s -> { m | log = s }) .log Log.update
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -128,8 +123,6 @@ update msg model =
                 hubUpdate s model
             ScoresMsg (Scores.HubMsg s) ->
                 hubUpdate s model
-            LogMsg (Log.HubMsg s) ->
-                hubUpdate s model
             WsMsg s ->
                 t WsMsg (\m s -> { m | ws = s }) Ws.update s model.ws
             ContestsMsg s ->
@@ -146,8 +139,6 @@ update msg model =
                 t SubmissionsMsg (\m s -> { m | submissions = s }) Submissions.update s model.submissions
             ScoresMsg s ->
                 t ScoresMsg (\m s -> { m | scores = s }) Scores.update s model.scores
-            LogMsg s ->
-                t LogMsg (\m s -> { m | log = s }) Log.update s model.log
 
 
 view : Model -> Html Msg
@@ -167,8 +158,6 @@ view model =
             App.map SubmissionsMsg (Submissions.view model.submissions)
         scores =
             App.map ScoresMsg (Scores.view model.scores)
-        log =
-            App.map LogMsg (Log.view model.log)
         loading =
             Html.div
                 [ Attr.class "leader align-center"
@@ -191,7 +180,6 @@ view model =
                   else submitPanel
                 , submissions
                 , scores
-                , log
                 ]
     in
         if Array.length (model.contests.contests) == 0

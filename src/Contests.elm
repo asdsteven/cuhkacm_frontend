@@ -50,16 +50,18 @@ view model =
         f c =
             Html.button
                 [ Attr.classList
-                      [ ("button", True)
-                      , ("bd-white", True)
+                      [ ("button bd-white", True)
                       , ("bottom-shadow", c == model.contest)
                       ]
                 , Events.onClick (HubMsg (Hub.Contest c))
-                ] [Html.text c]
+                ]
+                [ Html.text c ]
         g c =
-            if c == model.contest
-            then Html.option [Attr.value c, Attr.selected True] [Html.text c]
-            else Html.option [Attr.value c] [Html.text c]
+            Html.option
+                [ Attr.value c
+                , Attr.selected (c == model.contest)
+                ]
+                [ Html.text c ]
         buttons =
             Array.map f model.contests
                 |> Array.toList

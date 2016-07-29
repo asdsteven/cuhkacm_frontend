@@ -21,8 +21,6 @@ type alias Submission =
 
 type Msg
     = Error String
-    | Notify (String, String, String)
-    | Oversize Int
     | Contests (Array String)
     | Server Time
     | Contest String
@@ -31,10 +29,13 @@ type Msg
     | Problems (Array Problem)
     | Submissions (Array Submission)
     | Scores (Dict String (Array (Int, Maybe Int)))
+    | LoginNoName
     | Login String
     | Logined String
     | Logout
     | Logouted
+    | SubmitNoFile
+    | SubmitOversize Int
     | Submit String String String
     | Submitted String
     | NewSubmission Submission

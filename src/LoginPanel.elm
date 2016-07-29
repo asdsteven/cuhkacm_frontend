@@ -32,8 +32,6 @@ subscriptions =
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
-        HubMsg (Hub.Login "") ->
-            model ! []
         HubMsg (Hub.Login _) ->
             { model | logining = True } ! []
         HubMsg (Hub.Logined _) ->
@@ -61,29 +59,29 @@ view model =
                       ] []
                 ]
         teamExists =
-            model.teams
-                |> Set.member model.name
+            Set.member model.name model.teams
         buttonText =
             if teamExists
-            then "Login"
-            else "New team"
-        buttonDisabled =
-            model.logining
+            then [Html.text "Login"]
+            else [Html.text "Create"]
         button =
             Html.button
                 [ Attr.classList
                       [ ("button no-margin full-size", True)
-                      , ("success", teamExists && not buttonDisabled)
-                      , ("primary", not teamExists && not buttonDisabled)
+                      , ("success", teamExists && not model.logining)
+                      , ("primary", not teamExists && not model.logining)
                       , ("loading-cube", model.logining)
                       ]
                 , Attr.type' "submit"
-                , Attr.disabled buttonDisabled
-                ]
-                [ Html.text buttonText ]
+                , Attr.disabled model.logining
+                ] buttonText
+        onSubmit =
+            if model.name == ""
+            then HubMsg (Hub.LoginNoName)
+            else HubMsg (Hub.Login model.name)
     in
         Html.form
-            [ Events.onSubmit (HubMsg (Hub.Login model.name)) ]
+            [ Events.onSubmit onSubmit ]
             [ Html.div [Attr.class "margin20 no-phone"] []
             , Html.div
                 [ Attr.class "flex-grid" ]

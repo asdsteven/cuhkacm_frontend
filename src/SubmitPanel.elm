@@ -37,7 +37,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ Ports.fileRead (HubMsg << Hub.Submit model.pid model.language)
-        , Ports.oversize (HubMsg << Hub.Oversize)
+        , Ports.oversize (HubMsg << Hub.SubmitOversize)
         ]
 
 
@@ -46,7 +46,7 @@ update msg model =
     case msg of
         HubMsg (Hub.Submitted _) ->
             { model | submitting = False } ! []
-        HubMsg (Hub.Oversize _) ->
+        HubMsg (Hub.SubmitOversize _) ->
             { model | submitting = False } ! []
         HubMsg (Hub.Problems s) ->
             { model | problems = List.map .title (Array.toList s) } ! []
@@ -124,7 +124,7 @@ view model =
                 Just _ ->
                     Submit
                 Nothing ->
-                    HubMsg (Hub.Notify ("", "Please upload a file", "warning"))
+                    HubMsg Hub.SubmitNoFile
     in
         Html.form
             [ Events.onSubmit onSubmit ]
